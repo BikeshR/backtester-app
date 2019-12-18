@@ -5,7 +5,8 @@
 // const morganStream = ({
 //   write: (data) => {
 //     const details = JSON.parse(data)
-//     const shortMessage = `${details.request_method} ${details.request_url} ${details.status} in ${details.response_time} ms`
+//     const shortMessage = `${details.request_method}
+//                ${details.request_url} ${details.status} in ${details.response_time} ms`
 
 //     if (details.status >= 500) {
 //       logger.error(shortMessage, { details })

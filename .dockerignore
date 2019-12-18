@@ -1,0 +1,9 @@
+# Ignore all
+*
+
+# Whitelist
+!package*.json
+!src/
+!.babelrc
+!.env-cmdrc
+!.eslintrc
