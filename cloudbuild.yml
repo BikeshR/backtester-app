@@ -5,8 +5,8 @@
 steps:
 - name: "gcr.io/cloud-builders/gcloud"
   args: [app, deploy]
-  dir: 'server'
-  
+  dir: 'client'
+
 - name: "gcr.io/cloud-builders/gcloud"
   args: [app, deploy]
-  dir: 'client'
+  dir: 'server'
