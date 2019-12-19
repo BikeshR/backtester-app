@@ -1,24 +1,12 @@
-steps:
-- id: docker build
-  name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/$PROJECT_ID/backtester-app', '.']
-- id: docker push
-  name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/$PROJECT_ID/backtester-app']
-- id: Deploy to Cloud Run
-  name: 'gcr.io/cloud-builders/gcloud'
-  args:
-  - beta
-  - run
-  - deploy
-  - backtester-app
-  - --image
-  - gcr.io/$PROJECT_ID/backtester-app
-  - --region
-  - us-central1
-  - --platform
-  - managed
-  - --allow-unauthenticated
+# steps:
+# - name: 'gcr.io/cloud-builders/docker'
+#   args: ['build', '-t', 'gcr.io/testapp-252513/bitbucket.org/bikeshr/testrepo:$SHORT_SHA', '.']
 
-images:
-- gcr.io/$PROJECT_ID/backtester-app
+steps:
+- name: "gcr.io/cloud-builders/gcloud"
+  args: [app, deploy]
+  dir: 'server'
+  
+- name: "gcr.io/cloud-builders/gcloud"
+  args: [app, deploy]
+  dir: 'client'
