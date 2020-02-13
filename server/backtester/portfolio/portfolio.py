@@ -1,7 +1,7 @@
 import datetime
 import numpy as np
 import pandas as pd
-import Queue
+import queue
 
 from abc import ABCMeta, abstractmethod
 from math import floor
@@ -9,7 +9,7 @@ from math import floor
 from event.fill_event import FillEvent
 from event.order_event import OrderEvent
 
-from performance import create_sharpe_ratio, create_drawdowns
+from performance.performance import create_sharpe_ratio, create_drawdowns
 
 
 class Portfolio(object):

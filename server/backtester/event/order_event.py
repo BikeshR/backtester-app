@@ -1,4 +1,4 @@
-from event import Event
+from event.event import Event
 
 
 class OrderEvent(Event):
@@ -32,5 +32,5 @@ class OrderEvent(Event):
         """
         Outputs the values within the Order.
         """
-        print "Order: Symbol=%s, Type=%s, Quantity=%s, Direction=%s" % \
-            (self.symbol, self.order_type, self.quantity, self.direction)
+        print("Order: Symbol=%s, Type=%s, Quantity=%s, Direction=%s" % \
+            (self.symbol, self.order_type, self.quantity, self.direction))

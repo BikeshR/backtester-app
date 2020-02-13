@@ -1,12 +1,31 @@
 # Declare the components with respective parameters
-bars = DataHandler(..)
-strategy = Strategy(..)
-port = Portfolio(..)
-broker = ExecutionHandler(..)
+from datetime import time
+import queue
+
+from data.alphavantage_data_handler import AplhavantageDataHandler
+from event.event import Event
+from execution.execution_handler import ExecutionHandler
+from portfolio.portfolio import Portfolio
+from strategy.strategy import Strategy
+
+#Events
+events = queue.Queue()
+
+#Bars
+bars = AplhavantageDataHandler(events, ['MSFT'])
+
+#Strategies
+strategy = Strategy()
+
+#Portfolios
+port = Portfolio()
+
+#Brokers
+broker = ExecutionHandler()
 
 while True:
     # Update the bars (specific backtest code, as opposed to live trading)
-    if bars.continue_backtest == True:
+    if bars.continue_backtest:
         bars.update_bars()
     else:
         break
@@ -15,7 +34,7 @@ while True:
     while True:
         try:
             event = events.get(False)
-        except Queue.Empty:
+        except queue.Empty:
             break
         else:
             if event is not None:

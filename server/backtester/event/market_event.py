@@ -1,4 +1,5 @@
-from event import Event
+from event.event import Event
+
 
 class MarketEvent(Event):
     """

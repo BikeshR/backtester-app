@@ -1,15 +1,19 @@
-from server.backtester.data.data_handler import DataHandler
+import requests
+import datetime
+import pandas as pd
+
+from data.data_handler import DataHandler
 
 
-class HistoricCSVDataHandler(DataHandler):
+class AplhavantageDataHandler(DataHandler):
     """
-    HistoricCSVDataHandler is designed to read CSV files for
+    AplhavantageDataHandler is designed to feed off of Alphavantage API for
     each requested symbol from disk and provide an interface
     to obtain the "latest" bar in a manner identical to a live
-    trading interface. 
+    trading interface.
     """
 
-    def __init__(self, events, csv_dir, symbol_list):
+    def __init__(self, events, symbol_list):
         """
         Initialises the historic data handler by requesting
         the location of the CSV files and a list of symbols.
@@ -23,16 +27,15 @@ class HistoricCSVDataHandler(DataHandler):
         symbol_list - A list of symbol strings.
         """
         self.events = events
-        self.csv_dir = csv_dir
         self.symbol_list = symbol_list
 
         self.symbol_data = {}
         self.latest_symbol_data = {}
         self.continue_backtest = True
 
-        self._open_convert_csv_files()
+        self._get_alphavantage_data()
 
-    def _open_convert_csv_files(self):
+    def _get_alphavantage_data(self):
         """
         Opens the CSV files from the data directory, converting
         them into pandas DataFrames within a symbol dictionary.
@@ -42,13 +45,9 @@ class HistoricCSVDataHandler(DataHandler):
         """
         comb_index = None
         for s in self.symbol_list:
-            # Load the CSV file with no header information, indexed on date
-            self.symbol_data[s] = pd.io.parsers.read_csv(
-                os.path.join(self.csv_dir, '%s.csv' % s),
-                header=0, index_col=0,
-                names=['datetime', 'open', 'low',
-                       'high', 'close', 'volume', 'oi']
-            )
+            # Call the Alphavantage API to get the json and add to the symbol_data
+            r = requests.get(f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={s}&outputsize=compact&apikey=CX04WU00KT84WP7F')
+            self.symbol_data[s] = pd.io.read_json(r.json())
 
             # Combine the index to pad forward values
             if comb_index is None:
@@ -81,7 +80,7 @@ class HistoricCSVDataHandler(DataHandler):
         try:
             bars_list = self.latest_symbol_data[symbol]
         except KeyError:
-            print "That symbol is not available in the historical data set."
+            print ("That symbol is not available in the historical data set.")
         else:
             return bars_list[-N:]
 

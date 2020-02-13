@@ -14,7 +14,7 @@ class DataHandler(object):
     all subsequent (inherited) data handlers (both live and historic).
 
     The goal of a (derived) DataHandler object is to output a generated
-    set of bars (OLHCVI) for each symbol requested. 
+    set of bars (OLHCVI) for each symbol requested.
 
     This will replicate how a live strategy would function as current
     market data would be sent "down the pipe". Thus a historic and live
@@ -22,6 +22,10 @@ class DataHandler(object):
     """
 
     __metaclass__ = ABCMeta
+
+    @property
+    def continue_backtest(self):
+        raise NotImplementedError("Should implement continue_backtest()")
 
     @abstractmethod
     def get_latest_bars(self, symbol, N=1):
