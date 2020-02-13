@@ -1,4 +1,4 @@
-from event.event import Event
+from backtester.event.event import Event
 
 
 class MarketEvent(Event):

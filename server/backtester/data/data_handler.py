@@ -5,9 +5,6 @@ import pandas as pd
 
 from abc import ABCMeta, abstractmethod
 
-from event.market_event import MarketEvent
-
-
 class DataHandler(object):
     """
     DataHandler is an abstract base class providing an interface for

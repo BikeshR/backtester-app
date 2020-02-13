@@ -2,54 +2,56 @@
 from datetime import time
 import queue
 
-from data.alphavantage_data_handler import AplhavantageDataHandler
-from event.event import Event
-from execution.execution_handler import ExecutionHandler
-from portfolio.portfolio import Portfolio
-from strategy.strategy import Strategy
+from backtester.data.alphavantage_data_handler import AlphavantageDataHandler
+# from backtester.event.event import Event
+# from backtester.execution_handler import ExecutionHandler
+# from backtester.portfolio import Portfolio
+# from backtester.strategy import Strategy
 
-#Events
-events = queue.Queue()
+def loop():
 
-#Bars
-bars = AplhavantageDataHandler(events, ['MSFT'])
+    # Events
+    events = queue.Queue()
 
-#Strategies
-strategy = Strategy()
+    # Bars
+    bars = AlphavantageDataHandler(events, ['MSFT'])
 
-#Portfolios
-port = Portfolio()
+    # Strategies
+    strategy = Strategy()
 
-#Brokers
-broker = ExecutionHandler()
+    # Portfolios
+    port = Portfolio()
 
-while True:
-    # Update the bars (specific backtest code, as opposed to live trading)
-    if bars.continue_backtest:
-        bars.update_bars()
-    else:
-        break
+    # Brokers
+    broker = ExecutionHandler()
 
-    # Handle the events
     while True:
-        try:
-            event = events.get(False)
-        except queue.Empty:
-            break
+        # Update the bars (specific backtest code, as opposed to live trading)
+        if bars.continue_backtest:
+            bars.update_bars()
         else:
-            if event is not None:
-                if event.type == 'MARKET':
-                    strategy.calculate_signals(event)
-                    port.update_timeindex(event)
+            break
 
-                elif event.type == 'SIGNAL':
-                    port.update_signal(event)
+        # Handle the events
+        while True:
+            try:
+                event = events.get(False)
+            except queue.Empty:
+                break
+            else:
+                if event is not None:
+                    if event.type == 'MARKET':
+                        strategy.calculate_signals(event)
+                        port.update_timeindex(event)
 
-                elif event.type == 'ORDER':
-                    broker.execute_order(event)
+                    elif event.type == 'SIGNAL':
+                        port.update_signal(event)
 
-                elif event.type == 'FILL':
-                    port.update_fill(event)
+                    elif event.type == 'ORDER':
+                        broker.execute_order(event)
 
-    # 10-Minute heartbeat
-    time.sleep(10*60)
+                    elif event.type == 'FILL':
+                        port.update_fill(event)
+
+        # 10-Minute heartbeat
+        time.sleep(10 * 60)

@@ -2,16 +2,21 @@ import requests
 import datetime
 import pandas as pd
 
-from data.data_handler import DataHandler
+from backtester.data.data_handler import DataHandler
+from backtester.event.market_event import MarketEvent
 
 
-class AplhavantageDataHandler(DataHandler):
+class AlphavantageDataHandler(DataHandler):
     """
-    AplhavantageDataHandler is designed to feed off of Alphavantage API for
+    AlphavantageDataHandler is designed to feed off of Alphavantage API for
     each requested symbol from disk and provide an interface
     to obtain the "latest" bar in a manner identical to a live
     trading interface.
     """
+
+    @property
+    def continue_backtest(self):
+        pass
 
     def __init__(self, events, symbol_list):
         """
