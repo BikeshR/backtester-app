@@ -1,12 +1,12 @@
 # Declare the components with respective parameters
-from datetime import time
+import time
 import queue
 
 from backtester.data.alphavantage_data_handler import AlphavantageDataHandler
-# from backtester.event.event import Event
-# from backtester.execution_handler import ExecutionHandler
-# from backtester.portfolio import Portfolio
-# from backtester.strategy import Strategy
+from backtester.strategy.buy_and_hold_strategy import BuyAndHoldStrategy
+from backtester.portfolio.naive_portfolio import NaivePortfolio
+from backtester.execution.simulated_execution_handler import SimulatedExecutionHandler
+
 
 def loop():
 
@@ -17,13 +17,14 @@ def loop():
     bars = AlphavantageDataHandler(events, ['MSFT'])
 
     # Strategies
-    strategy = Strategy()
+    strategy = BuyAndHoldStrategy(bars, events)
 
     # Portfolios
-    port = Portfolio()
+    start_date = '2019-09-27'
+    port = NaivePortfolio(bars, events, start_date)
 
     # Brokers
-    broker = ExecutionHandler()
+    broker = SimulatedExecutionHandler(events)
 
     while True:
         # Update the bars (specific backtest code, as opposed to live trading)
@@ -35,10 +36,12 @@ def loop():
         # Handle the events
         while True:
             try:
+                print(events)
                 event = events.get(False)
             except queue.Empty:
                 break
             else:
+                print(event)
                 if event is not None:
                     if event.type == 'MARKET':
                         strategy.calculate_signals(event)
@@ -54,4 +57,4 @@ def loop():
                         port.update_fill(event)
 
         # 10-Minute heartbeat
-        time.sleep(10 * 60)
+        time.sleep(10)

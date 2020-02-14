@@ -6,7 +6,7 @@ from ib.ext.Order import Order
 from ib.opt import ibConnection, message
 
 from event import FillEvent, OrderEvent
-from execution import ExecutionHandler
+from backtester.execution.execution_handler import ExecutionHandler
 
 
 class IBExecutionHandler(ExecutionHandler):

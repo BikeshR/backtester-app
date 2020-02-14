@@ -1,4 +1,7 @@
-from execution.execution_handler import ExecutionHandler
+import datetime
+
+from backtester.execution.execution_handler import ExecutionHandler
+from backtester.event.fill_event import FillEvent
 
 
 class SimulatedExecutionHandler(ExecutionHandler):
@@ -32,5 +35,5 @@ class SimulatedExecutionHandler(ExecutionHandler):
         """
         if event.type == 'ORDER':
             fill_event = FillEvent(datetime.datetime.utcnow(), event.symbol,
-                                   'ARCA', event.quantity, event.direction, None)
+                                   'ARCA', event.quantity, event.direction, 100)
             self.events.put(fill_event)

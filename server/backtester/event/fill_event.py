@@ -1,4 +1,4 @@
-from event.event import Event
+from backtester.event.event import Event
 
 class FillEvent(Event):
     """
@@ -58,5 +58,10 @@ class FillEvent(Event):
             full_cost = max(1.3, 0.013 * self.quantity)
         else: # Greater than 500
             full_cost = max(1.3, 0.008 * self.quantity)
+        print(full_cost)
+        print(self.quantity)
+        print(type(self.quantity))
+        print(self.fill_cost)
+        print(type(self.fill_cost))
         full_cost = min(full_cost, 0.5 / 100.0 * self.quantity * self.fill_cost)
         return full_cost

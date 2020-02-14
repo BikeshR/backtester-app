@@ -5,9 +5,6 @@ import queue
 
 from abc import ABCMeta, abstractmethod
 
-from event.signal_event import SignalEvent
-
-
 class Strategy(object):
     """
     Strategy is an abstract base class providing an interface for

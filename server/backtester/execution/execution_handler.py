@@ -1,10 +1,4 @@
-import datetime
-import queue
-
 from abc import ABCMeta, abstractmethod
-
-from event.fill_event import FillEvent
-from event.order_event import OrderEvent
 
 
 class ExecutionHandler(object):

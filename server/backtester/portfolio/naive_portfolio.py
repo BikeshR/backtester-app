@@ -1,4 +1,14 @@
-from portfolio import Portfolio
+import datetime
+import numpy as np
+import pandas as pd
+import queue
+
+from math import floor
+
+from backtester.portfolio.portfolio import Portfolio
+from backtester.event.order_event import OrderEvent
+
+from backtester.performance.performance import create_sharpe_ratio, create_drawdowns
 
 
 class NaivePortfolio(Portfolio):
@@ -28,11 +38,18 @@ class NaivePortfolio(Portfolio):
         self.initial_capital = initial_capital
 
         self.all_positions = self.construct_all_positions()
-        self.current_positions = dict(
-            (k, v) for k, v in [(s, 0) for s in self.symbol_list])
+        print('all positions')
+        print(self.all_positions)
+        self.current_positions = dict((k, v) for k, v in [(s, 0) for s in self.symbol_list])
+        print('current positions')
+        print(self.current_positions)
 
         self.all_holdings = self.construct_all_holdings()
+        print('all holdings')
+        print(self.all_holdings)
         self.current_holdings = self.construct_current_holdings()
+        print('current holdings')
+        print(self.current_holdings)
 
     def construct_all_positions(self):
         """
@@ -81,12 +98,17 @@ class NaivePortfolio(Portfolio):
         # Update positions
         dp = dict((k, v) for k, v in [(s, 0) for s in self.symbol_list])
         dp['datetime'] = bars[self.symbol_list[0]][0][1]
+        print('dp')
+        print(dp)
 
         for s in self.symbol_list:
             dp[s] = self.current_positions[s]
 
+        print(dp)
         # Append the current positions
         self.all_positions.append(dp)
+
+        print(self.all_positions)
 
         # Update holdings
         dh = dict((k, v) for k, v in [(s, 0) for s in self.symbol_list])
@@ -95,14 +117,26 @@ class NaivePortfolio(Portfolio):
         dh['commission'] = self.current_holdings['commission']
         dh['total'] = self.current_holdings['cash']
 
+        print('dh')
+        print(dh)
+
         for s in self.symbol_list:
             # Approximation to the real value
-            market_value = self.current_positions[s] * bars[s][0][5]
+            print('current positions')
+            print(self.current_positions[s])
+            print(type(self.current_positions[s]))
+            print(bars[s][0][5])
+            print(type(bars[s][0][5]))
+            market_value = self.current_positions[s] * float(bars[s][0][5])
+            print(market_value)
+            print(type(market_value))
             dh[s] = market_value
             dh['total'] += market_value
+            print(dh)
 
         # Append the current holdings
         self.all_holdings.append(dh)
+        print(self.all_holdings)
 
     def update_positions_from_fill(self, fill):
         """
@@ -120,7 +154,7 @@ class NaivePortfolio(Portfolio):
             fill_dir = -1
 
         # Update positions list with new quantities
-        self.current_positions[fill.symbol] += fill_dir*fill.quantity
+        self.current_positions[fill.symbol] += fill_dir * fill.quantity
 
     def update_holdings_from_fill(self, fill):
         """
@@ -139,7 +173,14 @@ class NaivePortfolio(Portfolio):
 
         # Update holdings list with new quantities
         fill_cost = self.bars.get_latest_bars(fill.symbol)[0][5]  # Close price
-        cost = fill_dir * fill_cost * fill.quantity
+        print(fill_cost)
+        print(type(fill_cost))
+        print(fill_dir)
+        print(type(fill_dir))
+        print(fill.quantity)
+        print(type(fill.quantity))
+        cost = fill_dir * float(fill_cost) * fill.quantity
+        print(cost)
         self.current_holdings[fill.symbol] += cost
         self.current_holdings['commission'] += fill.commission
         self.current_holdings['cash'] -= (cost + fill.commission)
@@ -201,7 +242,7 @@ class NaivePortfolio(Portfolio):
         curve = pd.DataFrame(self.all_holdings)
         curve.set_index('datetime', inplace=True)
         curve['returns'] = curve['total'].pct_change()
-        curve['equity_curve'] = (1.0+curve['returns']).cumprod()
+        curve['equity_curve'] = (1.0 + curve['returns']).cumprod()
         self.equity_curve = curve
 
     def output_summary_stats(self):

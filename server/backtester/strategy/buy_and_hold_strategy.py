@@ -1,4 +1,5 @@
-from strategy.strategy import Strategy
+from backtester.strategy.strategy import Strategy
+from backtester.event.signal_event import SignalEvent
 
 
 class BuyAndHoldStrategy(Strategy):
@@ -48,9 +49,11 @@ class BuyAndHoldStrategy(Strategy):
         if event.type == 'MARKET':
             for s in self.symbol_list:
                 bars = self.bars.get_latest_bars(s, N=1)
+                print('Strategy>calculate_sinals bars')
+                print(bars)
                 if bars is not None and bars != []:
-                    if self.bought[s] == False:
+                    if not self.bought[s]:
                         # (Symbol, Datetime, Type = LONG, SHORT or EXIT)
-                        signal = SignalEvent(bars[0][0], bars[0][1], 'LONG')
+                        signal = SignalEvent(bars[0][0], bars[0][1], 'LONG', 100)
                         self.events.put(signal)
                         self.bought[s] = True

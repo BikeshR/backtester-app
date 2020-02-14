@@ -20,10 +20,6 @@ class DataHandler(object):
 
     __metaclass__ = ABCMeta
 
-    @property
-    def continue_backtest(self):
-        raise NotImplementedError("Should implement continue_backtest()")
-
     @abstractmethod
     def get_latest_bars(self, symbol, N=1):
         """

@@ -1,5 +1,4 @@
 import requests
-import datetime
 import pandas as pd
 
 from backtester.data.data_handler import DataHandler
@@ -13,10 +12,6 @@ class AlphavantageDataHandler(DataHandler):
     to obtain the "latest" bar in a manner identical to a live
     trading interface.
     """
-
-    @property
-    def continue_backtest(self):
-        pass
 
     def __init__(self, events, symbol_list):
         """
@@ -51,8 +46,13 @@ class AlphavantageDataHandler(DataHandler):
         comb_index = None
         for s in self.symbol_list:
             # Call the Alphavantage API to get the json and add to the symbol_data
-            r = requests.get(f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={s}&outputsize=compact&apikey=CX04WU00KT84WP7F')
-            self.symbol_data[s] = pd.io.read_json(r.json())
+            # print(type(s))
+            r = requests.get(f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={s}&outputsize=compact&apikey=CX04WU00KT84WP7F').json()
+            # print(r)
+            series = r["Time Series (Daily)"]
+            # print(series)
+            self.symbol_data[s] = pd.DataFrame(series).T
+            # print(self.symbol_data)
 
             # Combine the index to pad forward values
             if comb_index is None:
@@ -60,6 +60,7 @@ class AlphavantageDataHandler(DataHandler):
             else:
                 comb_index.union(self.symbol_data[s].index)
 
+            # print(comb_index)
             # Set the latest symbol_data to None
             self.latest_symbol_data[s] = []
 
@@ -71,11 +72,12 @@ class AlphavantageDataHandler(DataHandler):
     def _get_new_bar(self, symbol):
         """
         Returns the latest bar from the data feed as a tuple of 
-        (sybmbol, datetime, open, low, high, close, volume).
+        (symbol, datetime, open, low, high, close, volume).
         """
         for b in self.symbol_data[symbol]:
-            yield tuple([symbol, datetime.datetime.strptime(b[0], '%Y-%m-%d %H:%M:%S'),
-                         b[1][0], b[1][1], b[1][2], b[1][3], b[1][4]])
+            # print(b)
+            # print(tuple([symbol, b[0], b[1][0], b[1][2], b[1][1], b[1][3], b[1][5]]))
+            yield tuple([symbol, b[0], b[1][0], b[1][2], b[1][1], b[1][3], b[1][5]])
 
     def get_latest_bars(self, symbol, N=1):
         """
@@ -96,7 +98,7 @@ class AlphavantageDataHandler(DataHandler):
         """
         for s in self.symbol_list:
             try:
-                bar = self._get_new_bar(s).next()
+                bar = self._get_new_bar(s).__next__()
             except StopIteration:
                 self.continue_backtest = False
             else:

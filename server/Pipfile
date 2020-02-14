@@ -12,6 +12,7 @@ pandas = "*"
 numpy = "*"
 flask = "*"
 requests = "*"
+event = "*"
 
 [requires]
 python_version = "3.7"
